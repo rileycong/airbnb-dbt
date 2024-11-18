@@ -5,11 +5,13 @@ models:
     columns:
 
     - name: listing_id
+      description: Primary key for the listing
       tests:
          - unique
          - not_null
     
     - name: host_id
+      description: The hosts' id. References the host table.
       tests:
         - not_null
         - relationships:
@@ -17,6 +19,7 @@ models:
             field: host_id
     
     - name: room_type
+      description: Type of apartment/room.
       tests:
         - accepted_values:
             values: ['Entire home/apt',
@@ -26,5 +29,43 @@ models:
                     ]
     
     - name: minimum_nights
+      description: '{{ doc("dim_listing_cleansed__minimum_nights") }}'
       tests:
         - positive_value
+
+  - name: dim_hosts_cleansed
+    columns:
+      - name: host_id
+        tests:
+          - not_null
+          - unique
+      
+      - name: host_name
+        tests:
+          - not_null
+      
+      - name: is_superhost
+        description: Whether the host is a highly rated host or not.
+        tests:
+          - accepted_values:
+              values: ['t', 'f']
+  
+  - name: fct_reviews
+    columns:
+      - name: listing_id
+        description: The listing ID. References the listing table.
+        tests:
+          - relationships:
+              to: ref('dim_listings_cleansed')
+              field: listing_id
+
+      - name: reviewer_name
+        description: '{{ doc("dim_hosts_cleansed__reviewer_name") }}'
+        tests:
+          - not_null
+      
+      - name: review_sentiment
+        description: The sentiment classification of the review.
+        tests:
+          - accepted_values:
+              values: ['positive', 'neutral', 'negative']
