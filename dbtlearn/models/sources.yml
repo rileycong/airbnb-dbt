@@ -6,6 +6,19 @@ sources:
     tables:
       - name: listings
         identifier: raw_listings
+        columns:
+          - name: room_type
+            tests:
+              - dbt_expectations.expect_column_distinct_count_to_equal:
+                  value: 4  # ensure only 4 room types in the source table
+                  # running this tests would apply to all the tables dependent on this source
+
+          - name: price
+            tests:
+              - dbt_expectations.expect_column_values_to_match_regex:
+                  regex: "^\\\\$[0-9][0-9\\\\.]+$"   # snowflake and yaml so we need 4 other backslashes to escape the backslash for escaping $
+                  # start with $, a number, and ends with number or dot.
+
 
       - name: hosts
         identifier: raw_hosts
